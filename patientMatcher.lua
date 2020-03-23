@@ -5,6 +5,7 @@ function OnStoredInstance(instanceId, tags, metadata, origin)
     local patientName = string.lower(tags["PatientName"])
     local PatientBirthDate = string.lower(tags["PatientBirthDate"])
     local StudyDate = string.lower(tags["StudyDate"])
+    -- Need to modify StudyUID and InstanceUID to prevent colision with original study
     local newStudyInstanceUID = string.lower(tags["StudyInstanceUID"]) .. ".2"
     local newSeriesInstanceUID = string.lower(tags["SeriesInstanceUID"]) .. ".2"
 
@@ -20,8 +21,6 @@ function OnStoredInstance(instanceId, tags, metadata, origin)
       replace["AccessionNumber"] = parsedResponse["studyid"]
       replace["StudyInstanceUID"] = newStudyInstanceUID
       replace["SeriesInstanceUID"] = newSeriesInstanceUID
-      
-      
 
       -- modify instance
       local command = {}
