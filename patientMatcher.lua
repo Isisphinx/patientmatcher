@@ -5,6 +5,8 @@ function OnStoredInstance(instanceId, tags, metadata, origin)
     local patientName = string.lower(tags["PatientName"])
     local PatientBirthDate = string.lower(tags["PatientBirthDate"])
     local StudyDate = string.lower(tags["StudyDate"])
+    local newStudyInstanceUID = string.lower(tags["StudyInstanceUID"]) .. ".2"
+    local newSeriesInstanceUID = string.lower(tags["SeriesInstanceUID"]) .. ".2"
 
     local response = HttpGet("http://<IP:PORT>/study/" .. PatientBirthDate .. "/" .. patientName .. "/" .. StudyDate)
     print(response)
@@ -16,6 +18,10 @@ function OnStoredInstance(instanceId, tags, metadata, origin)
       local replace = {}
       replace["PatientID"] = parsedResponse["patientid"]
       replace["AccessionNumber"] = parsedResponse["studyid"]
+      replace["StudyInstanceUID"] = parsedResponse["newStudyInstanceUID"]
+      replace["SeriesInstanceUID"] = parsedResponse["newSeriesInstanceUID"]
+      
+      
 
       -- modify instance
       local command = {}
