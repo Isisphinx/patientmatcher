@@ -18,8 +18,8 @@ function OnStoredInstance(instanceId, tags, metadata, origin)
       local replace = {}
       replace["PatientID"] = parsedResponse["patientid"]
       replace["AccessionNumber"] = parsedResponse["studyid"]
-      replace["StudyInstanceUID"] = parsedResponse["newStudyInstanceUID"]
-      replace["SeriesInstanceUID"] = parsedResponse["newSeriesInstanceUID"]
+      replace["StudyInstanceUID"] = newStudyInstanceUID
+      replace["SeriesInstanceUID"] = newSeriesInstanceUID
       
       
 
