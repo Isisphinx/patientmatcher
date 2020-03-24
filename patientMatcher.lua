@@ -8,6 +8,7 @@ function OnStoredInstance(instanceId, tags, metadata, origin)
     -- Need to modify StudyUID and InstanceUID to prevent colision with original study
     local newStudyInstanceUID = string.lower(tags["StudyInstanceUID"]) .. ".2"
     local newSeriesInstanceUID = string.lower(tags["SeriesInstanceUID"]) .. ".2"
+    local newSOPInstanceUID = string.lower(tags["SOPInstanceUID"]) .. ".2"
 
     local response = HttpGet("http://<IP:PORT>/study/" .. PatientBirthDate .. "/" .. patientName .. "/" .. StudyDate)
     print(response)
@@ -20,7 +21,7 @@ function OnStoredInstance(instanceId, tags, metadata, origin)
       replace["PatientID"] = parsedResponse["patientid"]
       replace["AccessionNumber"] = parsedResponse["studyid"]
       replace["StudyInstanceUID"] = newStudyInstanceUID
-      replace["SeriesInstanceUID"] = newSeriesInstanceUID
+      replace["SOPInstanceUID"] = newSOPInstanceUID
 
       -- modify instance
       local command = {}
