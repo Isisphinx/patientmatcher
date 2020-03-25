@@ -84,7 +84,7 @@ func storePatient(w http.ResponseWriter, r *http.Request) {
 
 func sanitizeName(name string) string {
 	name = strings.ToLower(strings.Replace(name, "^", ":", -1))
-	t := transform.Chain(norm.NFD, runes.Remove(runes.In(unicode.Diacritic)), runes.Remove(runes.In(unicode.Dash)), norm.NFC)
+	t := transform.Chain(norm.NFD, runes.Remove(runes.In(unicode.Diacritic)), runes.Remove(runes.In(unicode.Dash)), runes.Remove(runes.In(unicode.Space)), norm.NFC)
 	result, _, _ := transform.String(t, name)
 	return result
 }
