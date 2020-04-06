@@ -115,11 +115,12 @@ func storeStudy(w http.ResponseWriter, r *http.Request) {
 	dec.DisallowUnknownFields()
 
 	var jsonIn struct {
-		Name      string `json:"name"`
-		DoB       string `json:"dateofbirth"`
-		PatientID string `json:"patientid"`
-		StudyDate string `json:"studydate"`
-		StudyID   string `json:"studyid"`
+		Name             string `json:"name"`
+		DoB              string `json:"dateofbirth"`
+		PatientID        string `json:"patientid"`
+		StudyDate        string `json:"studydate"`
+		StudyID          string `json:"studyid"`
+		StudyInstanceUID string `json:"studyinstanceuid"`
 	}
 
 	err := dec.Decode(&jsonIn)
@@ -132,11 +133,13 @@ func storeStudy(w http.ResponseWriter, r *http.Request) {
 	key := fmt.Sprintf("%s:%s:%s", jsonIn.DoB, sanitizeName(jsonIn.Name), jsonIn.StudyDate)
 
 	valueStruct := struct {
-		PatientID string `json:"patientid"`
-		StudyID   string `json:"studyid"`
+		PatientID        string `json:"patientid"`
+		StudyID          string `json:"studyid"`
+		StudyInstanceUID string `json:"studyinstanceuid"`
 	}{
-		PatientID: jsonIn.PatientID,
-		StudyID:   jsonIn.StudyID,
+		PatientID:        jsonIn.PatientID,
+		StudyID:          jsonIn.StudyID,
+		StudyInstanceUID: jsonIn.StudyInstanceUID,
 	}
 
 	value, err := json.Marshal(valueStruct)
