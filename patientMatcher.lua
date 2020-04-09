@@ -1,7 +1,8 @@
 function OnStoredInstance(instanceId, tags, metadata, origin)
   -- Prevent infinite loop
   if origin["RequestOrigin"] ~= "Lua" then
-    local PatientName = string.lower(tags["PatientName"])
+    -- Remove space for url GET
+    local PatientName = string.gsub(string.lower(tags["PatientName"]), "%s+", "")
     local PatientBirthDate = string.lower(tags["PatientBirthDate"])
     local StudyDate = string.lower(tags["StudyDate"])
     local newSeriesInstanceUID = string.lower(tags["SeriesInstanceUID"]) .. ".2"
