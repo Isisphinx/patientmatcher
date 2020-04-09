@@ -1,12 +1,6 @@
 function OnStoredInstance(instanceId, tags, metadata, origin)
   -- Prevent infinite loop
   if origin["RequestOrigin"] ~= "Lua" then
-    local stationName = tags["StationName"]
-    local physicianName = tags["ReferringPhysicianName"]
-    if (stationName == "SCANNER" and physicianName ~= "A") then
-      return
-    end
-
     local PatientName = string.lower(tags["PatientName"])
     local PatientBirthDate = string.lower(tags["PatientBirthDate"])
     local StudyDate = string.lower(tags["StudyDate"])
