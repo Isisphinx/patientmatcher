@@ -1,9 +1,9 @@
 <channel version="3.8.1">
-  <id>7f2dee7d-0986-4ad0-a3a9-256e848632c0</id>
+  <id>6417ab83-5d0c-47c8-b115-5bae2f70c8d1</id>
   <nextMetaDataId>4</nextMetaDataId>
-  <name>FetchHL7</name>
+  <name>FetchHL7v2</name>
   <description></description>
-  <revision>53</revision>
+  <revision>5</revision>
   <sourceConnector version="3.8.1">
     <metaDataId>0</metaDataId>
     <name>sourceConnector</name>
@@ -53,7 +53,18 @@
     </properties>
     <transformer version="3.8.1">
       <elements/>
-      <inboundTemplate encoding="base64"></inboundTemplate>
+      <inboundTemplate encoding="base64">TVNIfF5+XCZ8UElSQUR8UkFESU98SEw3fEhMN3wyMDIwMDQwOTEzNTMxNHx8T1JNXk8wMXwyMDIw
+MDQwOTEzNTMxNHxQfDIuMy4xfHx8QUx8QUx8RlJ8QVNDSUkNUElEfDF8fDcwMjgzfHxDSEFVVklO
+XlJlbmVlfHwxOTM2MTExOHxGfHx8MTQgUlVFIERFIExZT05eXlNUIFFVRU5USU5eXjAyMTAwfHww
+MDAwMDAwMDAwfDAzMjM2MDc1NTZ8fHx8MjAyMjU3M3wyMzYxMTYyNzY1MDIwNTINUFYxfDF8T3wx
+XkVYVEVSTkV8fDIwMjI1NzN8fFJPU15ST0JBQ0hFXlBJRVJSRSBGUkFOQ09JU15eXkRSfEZPTkRS
+QV5GT05EUkFTXkNBUk9MRV5eXkRSfHx8fHx8fHx8fHwyMDIyNTczfHx8fHx8fHx8fHx8fHx8fHx8
+fHx8fHx8fDIwMjAwNDE3MTM1Mg1PUkN8Tld8fDIwMjI1NzN8fFNDfHxeXl4yMDIwMDQxNzEzNTIz
+MHx8MjAyMDA0MTcxMzUyMzANT0JSfDF8MjAyMjU3M3wyMDIyNTczfE1SMjAyMjU3M15JQ1JBTkUg
+SV5QSVJBRHx8fHx8fHx8fHx8fEZPTkRSQV5GT05EUkFTXkNBUk9MRV5eXkRyfHwyMDIyNTczfHwy
+MDIyNTczfHx8fE1SfEZ8fF5eXjIwMjAwNDE3MTM1MjMwfHx8fHxST1MmUk9CQUNIRSZQSUVSUkUg
+RlJBTkNPSVMNWkRTfDEuMi4yNTAuMS41OS4wLjk5OS4yMDIwMDQxNy4yMDIyNTczNV5eQVBQTElD
+QVRJT05eRElDT00=</inboundTemplate>
       <outboundTemplate encoding="base64"></outboundTemplate>
       <inboundDataType>HL7V2</inboundDataType>
       <outboundDataType>HL7V2</outboundDataType>
@@ -139,13 +150,25 @@
     <filter version="3.8.1">
       <elements>
         <com.mirth.connect.plugins.rulebuilder.RuleBuilderRule version="3.8.1">
-          <name>Accept message if &quot;$(&apos;mirth_type&apos;)&quot; equals &quot;ADT-A01&quot;</name>
+          <name>Accept message if &quot;$(&apos;mirth_type&apos;)&quot; equals &quot;ORM-O01&quot;</name>
           <sequenceNumber>0</sequenceNumber>
           <enabled>true</enabled>
           <field>$(&apos;mirth_type&apos;)</field>
           <condition>EQUALS</condition>
           <values>
-            <string>&quot;ADT-A01&quot;</string>
+            <string>&quot;ORM-O01&quot;</string>
+          </values>
+        </com.mirth.connect.plugins.rulebuilder.RuleBuilderRule>
+        <com.mirth.connect.plugins.rulebuilder.RuleBuilderRule version="3.8.1">
+          <name>Accept message if &quot;msg[&apos;OBR&apos;][&apos;OBR.24&apos;][&apos;OBR.24.1&apos;].toString()&quot; equals &quot;MR&quot; or &quot;CT&quot;</name>
+          <sequenceNumber>1</sequenceNumber>
+          <enabled>true</enabled>
+          <operator>AND</operator>
+          <field>msg[&apos;OBR&apos;][&apos;OBR.24&apos;][&apos;OBR.24.1&apos;].toString()</field>
+          <condition>EQUALS</condition>
+          <values>
+            <string>&quot;MR&quot;</string>
+            <string>&quot;CT&quot;</string>
           </values>
         </com.mirth.connect.plugins.rulebuilder.RuleBuilderRule>
       </elements>
@@ -218,16 +241,23 @@ object.dateofbirth = msg[&apos;PID&apos;][&apos;PID.7&apos;][&apos;PID.7.1&apos;
 object.name = msg[&apos;PID&apos;][&apos;PID.5&apos;][&apos;PID.5.1&apos;].toString() +&quot;^&quot;+ msg[&apos;PID&apos;][&apos;PID.5&apos;][&apos;PID.5.2&apos;].toString()
 object.patientid = msg[&apos;PID&apos;][&apos;PID.3&apos;][&apos;PID.3.1&apos;].toString();
 object.studyid = msg[&apos;PV1&apos;][&apos;PV1.19&apos;][&apos;PV1.19.1&apos;].toString()
+object.StudyInstanceUID = msg[&apos;ZDS&apos;][&apos;ZDS.1&apos;][&apos;ZDS.1.1&apos;].toString()
 object.studydate = admitTimeDate
 msg = JSON.stringify(object);</script>
           </com.mirth.connect.plugins.javascriptstep.JavaScriptStep>
         </elements>
-        <inboundTemplate encoding="base64">TVNIfF5+XCZ8UElSQUR8UkFESU98SEw3fEhMN3wyMDIwMDMxODE5MDEwNnx8QURUXkEwMXwyMDIw
-MDMxODE5MDEwNnxQfDIuMy4xfHx8QUx8QUx8RlJ8QVNDSUkNRVZOfEEwMXwyMDIwMDMxODE5MDEw
-Ng1QSUR8MXx8MjAwMzQ2N3x8VEVTVF5KRUFOfHwxOTg2MDQwN3xNfHx8fHx8fHx8fDIwMjE0NTgN
-UFYxfDF8T3wxXkVYVEVSTkV8fDIwMjE0NTh8fFJPU15ST0JBQ0hFXlBJRVJSRSBGUkFOQ09JU15e
-XkRSfHx8fHx8fHx8fHx8MjAyMTQ1OHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHwyMDIwMDMxODE4
-NTE=</inboundTemplate>
+        <inboundTemplate encoding="base64">TVNIfF5+XCZ8UElSQUR8UkFESU98SEw3fEhMN3wyMDIwMDQwOTEzNTMxNHx8T1JNXk8wMXwyMDIw
+MDQwOTEzNTMxNHxQfDIuMy4xfHx8QUx8QUx8RlJ8QVNDSUkNUElEfDF8fDcwMjgzfHxDSEFVVklO
+XlJlbmVlfHwxOTM2MTExOHxGfHx8MTQgUlVFIERFIExZT05eXlNUIFFVRU5USU5eXjAyMTAwfHww
+MDAwMDAwMDAwfDAzMjM2MDc1NTZ8fHx8MjAyMjU3M3wyMzYxMTYyNzY1MDIwNTINUFYxfDF8T3wx
+XkVYVEVSTkV8fDIwMjI1NzN8fFJPU15ST0JBQ0hFXlBJRVJSRSBGUkFOQ09JU15eXkRSfEZPTkRS
+QV5GT05EUkFTXkNBUk9MRV5eXkRSfHx8fHx8fHx8fHwyMDIyNTczfHx8fHx8fHx8fHx8fHx8fHx8
+fHx8fHx8fDIwMjAwNDE3MTM1Mg1PUkN8Tld8fDIwMjI1NzN8fFNDfHxeXl4yMDIwMDQxNzEzNTIz
+MHx8MjAyMDA0MTcxMzUyMzANT0JSfDF8MjAyMjU3M3wyMDIyNTczfE1SMjAyMjU3M15JQ1JBTkUg
+SV5QSVJBRHx8fHx8fHx8fHx8fEZPTkRSQV5GT05EUkFTXkNBUk9MRV5eXkRyfHwyMDIyNTczfHwy
+MDIyNTczfHx8fE1SfEZ8fF5eXjIwMjAwNDE3MTM1MjMwfHx8fHxST1MmUk9CQUNIRSZQSUVSUkUg
+RlJBTkNPSVMNWkRTfDEuMi4yNTAuMS41OS4wLjk5OS4yMDIwMDQxNy4yMDIyNTczNV5eQVBQTElD
+QVRJT05eRElDT00=</inboundTemplate>
         <outboundTemplate encoding="base64"></outboundTemplate>
         <inboundDataType>HL7V2</inboundDataType>
         <outboundDataType>JSON</outboundDataType>
@@ -350,7 +380,7 @@ return;</undeployScript>
     <metadata>
       <enabled>true</enabled>
       <lastModified>
-        <time>1584716863269</time>
+        <time>1586456210938</time>
         <timezone>Europe/Paris</timezone>
       </lastModified>
       <pruningSettings>
