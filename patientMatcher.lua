@@ -31,7 +31,7 @@ function OnStableStudy(studyId, tags, metadata)
   RestApiPut('/studies/' .. modifiedStudyId .. '/metadata/1024', 'rectified')
 
   -- Delete original study
-  RestApiDelete('/studies/' .. modifiedStudyId)
+  RestApiDelete('/studies/' .. studyId)
   -- Send rectified study to peers
   SendToPeers(orthancPeers, modifiedStudyId)
 end
