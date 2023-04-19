@@ -8,7 +8,20 @@ function OnStableStudy(studyId, tags, metadata)
 
   local orthancPeers = { 'PEER1', 'PEER2' }
 
-  local matcherResponse = RequestMatcher(matcherIp, matcherPort, tags['PatientName'], tags['PatientBirthDate'], tags['StudyDate'])
+  -- Get study details
+  local studyDetails = RestApiGet('/studies/' .. studyId)
+  local studyJson = ParseJson(studyDetails)
+
+  -- Get patient details
+  local patientID = studyJson['PatientID']
+  local patientDetails = RestApiGet('/patients/' .. patientID)
+  local patientJson = ParseJson(patientDetails)
+
+  -- Get patient name and birth date
+  local patientName = patientJson['MainDicomTags']['PatientName']
+  local patientBirthDate = patientJson['MainDicomTags']['PatientBirthDate']
+
+  local matcherResponse = RequestMatcher(matcherIp, matcherPort, patientName, patientBirthDate, tags['StudyDate'])
 
   -- Send Study without modification if not found in database and return early
   if (matcherResponse == 404) then
