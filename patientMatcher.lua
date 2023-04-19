@@ -8,8 +8,6 @@ function OnStableStudy(studyId, tags, metadata)
   local matcherIp = os.getenv('matcherIp')
   local matcherPort = os.getenv('matcherPort')
 
-  local orthancPeers = { 'PEER1', 'PEER2' }
-
   -- Get study details
   local studyDetails = RestApiGet('/studies/' .. studyId)
   local studyJson = ParseJson(studyDetails)
@@ -27,7 +25,7 @@ function OnStableStudy(studyId, tags, metadata)
 
   -- Send Study without modification if not found in database and return early
   if (matcherResponse == 404) then
-    SendToPeers(orthancPeers, studyId)
+    SendToPeers(studyId)
     return
   end
 
@@ -48,7 +46,7 @@ function OnStableStudy(studyId, tags, metadata)
   -- Delete original study
   RestApiDelete('/studies/' .. studyId)
   -- Send rectified study to peers
-  SendToPeers(orthancPeers, modifiedStudyId)
+  SendToPeers(modifiedStudyId)
 end
 
 -- Request Matcher
@@ -78,10 +76,9 @@ end
 --
 
 -- Send study to multiple peers
-function SendToPeers(peersList, studyId)
-  for _, peerName in ipairs(peersList) do
-    RestApiPost('/peers/' .. peerName .. '/store', studyId)
-  end
+function SendToPeers(id)
+--   RestApiPost('/peers/<peer>/store', id )
+--   RestApiPost('/modalities/<modality>/store', id)
 end
 
 -- Interpolate string with variables
