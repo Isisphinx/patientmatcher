@@ -1,38 +1,83 @@
-function OnStoredInstance(instanceId, tags, metadata, origin)
-  -- Prevent infinite loop
-  if origin["RequestOrigin"] ~= "Lua" then
-    -- Remove space for url GET
-    local PatientName = string.gsub(string.lower(tags["PatientName"]), "%s+", "")
-    local PatientBirthDate = string.lower(tags["PatientBirthDate"])
-    local StudyDate = string.lower(tags["StudyDate"])
-    local newSeriesInstanceUID = string.lower(tags["SeriesInstanceUID"]) .. ".2"
-    local newSOPInstanceUID = string.lower(tags["SOPInstanceUID"]) .. ".2"
+function OnStableStudy(studyId, tags, metadata)
+  -- Return early if study is already rectified
+  if metadata['1024'] == 'rectified' then return end
 
-    local response = HttpGet("http://<IP:PORT>/study/" .. PatientBirthDate .. "/" .. PatientName .. "/" .. StudyDate)
-    -- only modify if patient match
-    if (response ~= "" and response ~= nil) then
-      local parsedResponse = ParseJson(response)
-      local replace = {}
-      replace["PatientID"] = parsedResponse["patientid"]
-      replace["AccessionNumber"] = parsedResponse["studyid"]
-      replace["StudyInstanceUID"] = parsedResponse["studyinstanceuid"]
-      replace["SeriesInstanceUID"] = newSeriesInstanceUID
-      replace["SOPInstanceUID"] = newSOPInstanceUID
+  -- get environment variables port and ip
+  local matcherIp = os.getenv('matcherIp')
+  local matcherPort = os.getenv('matcherPort')
 
-      -- modify instance
-      local command = {}
-      command["Replace"] = replace
-      command["Force"] = true
-      local modifiedFile = RestApiPost("/instances/" .. instanceId .. "/modify", DumpJson(command, true))
-      -- Upload the modified instance to the Orthanc database so that
-      -- it can be sent by Orthanc to other modalities
-      local modifiedId = ParseJson(RestApiPost("/instances/", modifiedFile))["ID"]
-      -- Send the modified instance to another modality
-      RestApiPost("/peers/<PEER_NAME>/store", modifiedId)
-      -- Delete the original
-      RestApiDelete("/instances/" .. instanceId)
-    else
-      RestApiPost("/peers/<PEER_NAME>/store", instanceId)
-    end
+  local orthancPeers = { 'PEER1', 'PEER2' }
+
+  local matcherResponse = RequestMatcher(matcherIp, matcherPort, tags['PatientName'], tags['PatientBirthDate'], tags['StudyDate'])
+
+  -- Send Study without modification if not found in database and return early
+  if (matcherResponse == 404) then
+    SendToPeers(orthancPeers, studyId)
+    return
   end
+
+  -- Settup command for study modification
+  local replace = {}
+  replace['PatientID'] = matcherResponse['patientid']
+  replace['AccessionNumber'] = matcherResponse['studyid']
+  replace['StudyInstanceUID'] = matcherResponse['studyinstanceuid']
+  local command = {}
+  command['Replace'] = replace
+  command['Force'] = true
+  
+  -- Modify study and get new studyId 
+  local modifiedStudyId = ParseJson(RestApiPost('/studies/' .. studyId .. '/modify', DumpJson(command, true)))['ID']
+  -- Mark study as rectified
+  RestApiPut('/studies/' .. modifiedStudyId .. '/metadata/1024', 'rectified')
+
+  -- Delete original study
+  RestApiDelete('/studies/' .. modifiedStudyId)
+  -- Send rectified study to peers
+  SendToPeers(orthancPeers, modifiedStudyId)
+end
+
+-- Request Matcher
+function RequestMatcher(Ip, Port, rawPatientName, rawPatientBirthDate, rawStudyDate)
+  local matcherUrlTemplate = 'http://{ip}:{port}>/study/{PatientBirthDate}/{PatientName}/{StudyDate}'
+
+  local PatientName = Normalize(rawPatientName)
+  local PatientBirthDate = Normalize(rawPatientBirthDate)
+  local StudyDate = Normalize(rawStudyDate)
+
+  local matcherUrl = InterpolateString(matcherUrlTemplate, {
+    ip = Ip,
+    port = Port,
+    PatientBirthDate = PatientBirthDate,
+    PatientName = PatientName,
+    StudyDate = StudyDate
+  })
+  local matcherResponse = HttpGet(matcherUrl)
+
+  if (matcherResponse == '' or matcherResponse == nil) then return 404 end
+
+  return ParseJson(matcherResponse)
+end
+
+--
+-- Helper functions
+--
+
+-- Send study to multiple peers
+function SendToPeers(peersList, studyId)
+  for _, peerName in ipairs(peersList) do
+    RestApiPost('/peers/' .. peerName .. '/store', studyId)
+  end
+end
+
+-- Interpolate string with variables
+function InterpolateString(str, variables)
+  return (str:gsub('({%w+})', function(match)
+    local key = match:sub(2, -2)
+    return variables[key] or match
+  end))
+end
+
+-- Normalize string
+function Normalize(someString)
+  return string.gsub(string.lower(someString), '%s+', '')
 end
