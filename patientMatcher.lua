@@ -13,7 +13,7 @@ function OnStableStudy(studyId, tags, metadata)
   local studyJson = ParseJson(studyDetails)
 
   -- Get patient details
-  local patientID = studyJson['PatientID']
+  local patientID = studyJson['ParentPatient']
   local patientDetails = RestApiGet('/patients/' .. patientID)
   local patientJson = ParseJson(patientDetails)
 
@@ -51,7 +51,7 @@ end
 
 -- Request Matcher
 function RequestMatcher(Ip, Port, rawPatientName, rawPatientBirthDate, rawStudyDate)
-  local matcherUrlTemplate = 'http://{ip}:{port}>/study/{PatientBirthDate}/{PatientName}/{StudyDate}'
+  local matcherUrlTemplate = 'http://{ip}:{port}/study/{PatientBirthDate}/{PatientName}/{StudyDate}'
 
   local PatientName = Normalize(rawPatientName)
   local PatientBirthDate = Normalize(rawPatientBirthDate)
