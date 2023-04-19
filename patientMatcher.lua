@@ -51,20 +51,12 @@ end
 
 -- Request Matcher
 function RequestMatcher(Ip, Port, rawPatientName, rawPatientBirthDate, rawStudyDate)
-  local matcherUrlTemplate = 'http://{ip}:{port}/study/{PatientBirthDate}/{PatientName}/{StudyDate}'
 
   local PatientName = Normalize(rawPatientName)
   local PatientBirthDate = Normalize(rawPatientBirthDate)
   local StudyDate = Normalize(rawStudyDate)
-
-  local matcherUrl = InterpolateString(matcherUrlTemplate, {
-    ip = Ip,
-    port = Port,
-    PatientBirthDate = PatientBirthDate,
-    PatientName = PatientName,
-    StudyDate = StudyDate
-  })
-  local matcherResponse = HttpGet(matcherUrl)
+  
+  local matcherResponse = HttpGet("http://" .. Ip .. ':' .. Port .. "/study/" .. PatientBirthDate .. "/" .. PatientName .. "/" .. StudyDate)
 
   if (matcherResponse == '' or matcherResponse == nil) then return 404 end
 
@@ -79,14 +71,6 @@ end
 function SendToPeers(id)
 --   RestApiPost('/peers/<peer>/store', id )
 --   RestApiPost('/modalities/<modality>/store', id)
-end
-
--- Interpolate string with variables
-function InterpolateString(str, variables)
-  return (str:gsub('({%w+})', function(match)
-    local key = match:sub(2, -2)
-    return variables[key] or match
-  end))
 end
 
 -- Normalize string
