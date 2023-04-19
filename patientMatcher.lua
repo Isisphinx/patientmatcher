@@ -55,7 +55,7 @@ function RequestMatcher(Ip, Port, rawPatientName, rawPatientBirthDate, rawStudyD
   local PatientName = Normalize(rawPatientName)
   local PatientBirthDate = Normalize(rawPatientBirthDate)
   local StudyDate = Normalize(rawStudyDate)
-  
+  SetHttpTimeout(1)
   local matcherResponse = HttpGet("http://" .. Ip .. ':' .. Port .. "/study/" .. PatientBirthDate .. "/" .. PatientName .. "/" .. StudyDate)
 
   if (matcherResponse == '' or matcherResponse == nil) then return 404 end
