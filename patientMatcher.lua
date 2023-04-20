@@ -33,6 +33,17 @@ function OnStableStudy(studyId, tags, metadata)
     return
   end
   
+   -- Set up command for study modification
+  local studyReplace = {}
+  studyReplace['StudyInstanceUID'] = matcherResponse['studyinstanceuid']
+  local studyCommand = {}
+  studyCommand['Replace'] = studyReplace
+  studyCommand['Force'] = true
+  studyCommand['KeepSource'] = false
+
+  -- Modify study and get new studyId
+  local modifiedStudyId = ParseJson(RestApiPost('/studies/' .. studyId .. '/modify', DumpJson(studyCommand, true)))['ID']
+  
   -- Mark study as rectified
   RestApiPut('/studies/' .. modifiedStudyId .. '/metadata/1024', 'rectified')
 
@@ -47,17 +58,6 @@ function OnStableStudy(studyId, tags, metadata)
   -- Modify patient and get new patientId
   local modifiedPatientId = ParseJson(RestApiPost('/patients/' .. patientID .. '/modify', DumpJson(patientCommand, true)))['ID']
 
-  -- Set up command for study modification
-  local studyReplace = {}
-  studyReplace['StudyInstanceUID'] = matcherResponse['studyinstanceuid']
-  local studyCommand = {}
-  studyCommand['Replace'] = studyReplace
-  studyCommand['Force'] = true
-  studyCommand['KeepSource'] = false
-
-  -- Modify study and get new studyId
-  local modifiedStudyId = ParseJson(RestApiPost('/studies/' .. studyId .. '/modify', DumpJson(studyCommand, true)))['ID']
-
   -- Send rectified study to peers
-  SendToPeers(modifiedStudyId)
+  -- SendToPeers(modifiedStudyId)
 end
