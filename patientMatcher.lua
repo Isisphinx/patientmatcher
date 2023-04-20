@@ -2,7 +2,7 @@ local helpers = require('helpers')
 
 function OnStableStudy(studyId, tags, metadata)
   if (stationName == "SCANNER" and physicianName ~= "A") then return end
-  
+
   -- Return early if study is already rectified
   if metadata['1024'] == 'rectified' then return end
 
@@ -31,24 +31,18 @@ function OnStableStudy(studyId, tags, metadata)
     return
   end
 
-  -- Settup command for study modification
+  -- Set up command for patient modification
   local replace = {}
   replace['PatientID'] = matcherResponse['patientid']
-  replace['AccessionNumber'] = matcherResponse['studyid']
-  replace['StudyInstanceUID'] = matcherResponse['studyinstanceuid']
   local command = {}
   command['Replace'] = replace
   command['Force'] = true
-  
-  -- Modify study and get new studyId 
-  local modifiedStudyId = ParseJson(RestApiPost('/studies/' .. studyId .. '/modify', DumpJson(command, true)))['ID']
-  -- Mark study as rectified
-  RestApiPut('/studies/' .. modifiedStudyId .. '/metadata/1024', 'rectified')
 
-  -- Delete original study
-  RestApiDelete('/studies/' .. studyId)
+  -- Modify patient and get new patientId
+  local modifiedPatientId = ParseJson(RestApiPost('/patients/' .. patientID .. '/modify', DumpJson(command, true)))['ID']
+
   -- Send rectified study to peers
-  SendToPeers(modifiedStudyId)
+  SendToPeers(studyId)
 end
 
 -- Request Matcher
