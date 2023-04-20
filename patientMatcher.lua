@@ -1,4 +1,5 @@
 local helpers = require('helpers')
+local config = require("config")
 
 function OnStableStudy(studyId, tags, metadata)
   if (stationName == "SCANNER" and physicianName ~= "A") then return end
@@ -6,9 +7,9 @@ function OnStableStudy(studyId, tags, metadata)
   -- Return early if study is already rectified
   if metadata['1024'] == 'rectified' then return end
 
-  -- get environment variables port and ip
-  local matcherIp = os.getenv('matcherIp')
-  local matcherPort = os.getenv('matcherPort')
+  -- get port and ip
+  local matcherIp = config.matcherIp
+  local matcherPort = config.matcherPort
 
   -- Get study details
   local studyDetails = RestApiGet('/studies/' .. studyId)
