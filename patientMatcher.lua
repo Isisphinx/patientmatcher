@@ -1,3 +1,5 @@
+local helpers = require('helpers')
+
 function OnStableStudy(studyId, tags, metadata)
   if (stationName == "SCANNER" and physicianName ~= "A") then return end
   
@@ -61,16 +63,6 @@ function RequestMatcher(Ip, Port, rawPatientName, rawPatientBirthDate, rawStudyD
   if (matcherResponse == '' or matcherResponse == nil) then return 404 end
 
   return ParseJson(matcherResponse)
-end
-
---
--- Helper functions
---
-
--- Send study to multiple peers
-function SendToPeers(id)
---   RestApiPost('/peers/<peer>/store', id )
---   RestApiPost('/modalities/<modality>/store', id)
 end
 
 -- Normalize string
