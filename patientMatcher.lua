@@ -23,8 +23,9 @@ function OnStableStudy(studyId, tags, metadata)
   -- Get patient name and birth date
   local patientName = patientJson['MainDicomTags']['PatientName']
   local patientBirthDate = patientJson['MainDicomTags']['PatientBirthDate']
+  local studyDate = tags['StudyDate']
 
-  local matcherResponse = RequestMatcher(matcherIp, matcherPort, patientName, patientBirthDate, tags['StudyDate'])
+  local matcherResponse = RequestMatcher(matcherIp, matcherPort, patientName, patientBirthDate, studyDate)
 
   -- Send Study without modification if not found in database and return early
   if (matcherResponse == 404) then
@@ -33,34 +34,30 @@ function OnStableStudy(studyId, tags, metadata)
   end
 
   -- Set up command for patient modification
-  local replace = {}
-  replace['PatientID'] = matcherResponse['patientid']
-  local command = {}
-  command['Replace'] = replace
-  command['Force'] = true
+  local patientReplace = {}
+  patientReplace['PatientID'] = matcherResponse['patientid']
+  local patientCommand = {}
+  patientCommand['Replace'] = patientReplace
+  patientCommand['Force'] = true
+  patientCommand['KeepSource'] = false
 
   -- Modify patient and get new patientId
-  local modifiedPatientId = ParseJson(RestApiPost('/patients/' .. patientID .. '/modify', DumpJson(command, true)))['ID']
+  local modifiedPatientId = ParseJson(RestApiPost('/patients/' .. patientID .. '/modify', DumpJson(patientCommand, true)))['ID']
+
+  -- Set up command for study modification
+  local studyReplace = {}
+  studyReplace['StudyInstanceUID'] = matcherResponse['studyinstanceuid']
+  local studyCommand = {}
+  studyCommand['Replace'] = studyReplace
+  studyCommand['Force'] = true
+  studyCommand['KeepSource'] = false
+
+  -- Modify study and get new studyId
+  local modifiedStudyId = ParseJson(RestApiPost('/studies/' .. studyId .. '/modify', DumpJson(studyCommand, true)))['ID']
+
+  -- Mark study as rectified
+  RestApiPut('/studies/' .. modifiedStudyId .. '/metadata/1024', 'rectified')
 
   -- Send rectified study to peers
-  SendToPeers(studyId)
-end
-
--- Request Matcher
-function RequestMatcher(Ip, Port, rawPatientName, rawPatientBirthDate, rawStudyDate)
-
-  local PatientName = Normalize(rawPatientName)
-  local PatientBirthDate = Normalize(rawPatientBirthDate)
-  local StudyDate = Normalize(rawStudyDate)
-  SetHttpTimeout(1)
-  local matcherResponse = HttpGet("http://" .. Ip .. ':' .. Port .. "/study/" .. PatientBirthDate .. "/" .. PatientName .. "/" .. StudyDate)
-
-  if (matcherResponse == '' or matcherResponse == nil) then return 404 end
-
-  return ParseJson(matcherResponse)
-end
-
--- Normalize string
-function Normalize(someString)
-  return string.gsub(string.lower(someString), '%s+', '')
+  SendToPeers(modifiedStudyId)
 end
