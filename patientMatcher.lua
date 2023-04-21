@@ -39,7 +39,7 @@ function OnStableStudy(studyOrthancID, tags, metadata)
   studyCommand['Replace'] = studyReplace
   studyCommand['Force'] = true
   studyCommand['KeepSource'] = false
-  local modifiedStudyOrthancID = ParseJson(RestApiPost('/studies/' .. studyyOrthancdD.. '/modify', DumpJson(studyCommand, true)))['ID']
+  local modifiedStudyOrthancID = ParseJson(RestApiPost('/studies/' .. studyOrthancID.. '/modify', DumpJson(studyCommand, true)))['ID']
 
   -- Modify patient ID
   local patientReplace = {}
