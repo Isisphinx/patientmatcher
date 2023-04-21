@@ -24,3 +24,23 @@ end
 function Normalize(someString)
   return string.gsub(string.lower(someString), '%s+', '')
 end
+
+-- Send matching study to peers
+function SendMatchingStudy(patientOrthancID, targetStudyInstanceUID)
+  -- Get patient details
+  local patientDetails = ParseJson(RestApiGet('/patients/' .. patientOrthancID))
+
+  -- Loop through the studies of the patient
+  for _, studyOrthancID in ipairs(patientDetails['Studies']) do
+    -- Get study details with requestedTags query parameter
+    local requestedTags = 'StudyInstanceUID'
+    local studyDetails = ParseJson(RestApiGet('/studies/' .. studyOrthancID .. '?requestedTags=' .. requestedTags))
+
+    -- Check if the current study's StudyInstanceUID matches the targetStudyInstanceUID
+    if studyDetails['MainDicomTags']['StudyInstanceUID'] == targetStudyInstanceUID then
+      -- Send the matching study to peers
+      SendToPeers(studyOrthancID)
+      break
+    end
+  end
+end

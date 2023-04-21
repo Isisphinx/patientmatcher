@@ -51,5 +51,5 @@ function OnStableStudy(studyOrthancID, tags, metadata)
   local modifiedPatientOrthancID = ParseJson(RestApiPost('/patients/' .. patientOrthancID .. '/modify', DumpJson(patientCommand, true)))['ID']
 
   -- Send rectified study to peers
-  --SendToPeers(modifiedStudyId)
+  SendMatchingStudy(modifiedPatientOrthancID, matcherResponse['studyinstanceuid'])
 end
