@@ -1,3 +1,4 @@
+-- config.lua
 local config = {
   matcherIp = <IP>,
   matcherPort = <PORT>

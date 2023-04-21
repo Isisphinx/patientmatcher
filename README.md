@@ -12,3 +12,11 @@ GOOS=windows GOARCH=amd64 go build
 LISTEN_ADDR=":<PORT>" ./patientmatcher
 ```
 
+
+```
+patientmatcher
+├─ config.lua
+├─ helpers.lua
+└─ patientMatcher.lua
+
+```

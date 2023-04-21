@@ -1,3 +1,4 @@
+-- helper.lua
 function SendToPeers(id)
   command['Resources'] = {id}
   command['Asynchronous'] = true
