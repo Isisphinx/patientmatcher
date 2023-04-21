@@ -2,7 +2,7 @@
 local helpers = require('helpers')
 local config = require("config")
 
-function OnStableStudy(studyOrthancId, tags, metadata)
+function OnStableStudy(studyOrthancID, tags, metadata)
   if (stationName == "SCANNER" and physicianName ~= "A") then return end
 
   -- Return early if study is already rectified using the custom DICOM tag
@@ -14,7 +14,7 @@ function OnStableStudy(studyOrthancId, tags, metadata)
 
   -- Get study details with requestedTags query parameter
   local requestedTags = 'PatientName,PatientBirthDate,StudyDate,ParentPatient'
-  local studyDetails = ParseJson(RestApiGet('/studies/' .. studyOrthancId .. '?requestedTags=' .. requestedTags))
+  local studyDetails = ParseJson(RestApiGet('/studies/' .. studyOrthancID.. '?requestedTags=' .. requestedTags))
 
   -- Get patient name, birth date, and study date directly from the studyDetails
   local patientName = studyDetails['MainDicomTags']['PatientName']
@@ -26,7 +26,7 @@ function OnStableStudy(studyOrthancId, tags, metadata)
 
   -- Send Study without modification if not found in database and return early
   if (matcherResponse == 404) then
-    SendToPeers(studyOrthancId)
+    SendToPeers(studyOrthancID)
     return
   end
 
@@ -39,7 +39,7 @@ function OnStableStudy(studyOrthancId, tags, metadata)
   studyCommand['Replace'] = studyReplace
   studyCommand['Force'] = true
   studyCommand['KeepSource'] = false
-  local modifiedStudyOrthancID = ParseJson(RestApiPost('/studies/' .. studyOrthancId .. '/modify', DumpJson(studyCommand, true)))['ID']
+  local modifiedStudyOrthancID = ParseJson(RestApiPost('/studies/' .. studyyOrthancdD.. '/modify', DumpJson(studyCommand, true)))['ID']
 
   -- Modify patient ID
   local patientReplace = {}
