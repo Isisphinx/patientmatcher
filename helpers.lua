@@ -1,5 +1,6 @@
 -- helpers.lua
 function SendToPeers(id)
+  local command = {}
   command['Resources'] = {id}
   command['Asynchronous'] = true
   RestApiPost('/peers/<peer>/store', DumpJson(command, true) )
