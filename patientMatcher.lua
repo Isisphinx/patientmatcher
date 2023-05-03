@@ -3,6 +3,8 @@ local helpers = require('helpers')
 local config = require("config")
 
 function OnStableStudy(studyOrthancID, tags, metadata)
+  local stationName = metadata['StationName']
+  local physicianName = metadata['PhysicianName']
   if (stationName == "SCANNER" and physicianName ~= "A") then return end
 
   -- Return early if study is already rectified using the custom DICOM tag
