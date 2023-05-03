@@ -26,18 +26,17 @@ function Normalize(someString)
 end
 
 -- Send matching study to peers
-function SendMatchingStudy(patientOrthancID, targetStudyInstanceUID)
+function SendMatchingStudy(patientOrthancID, targetStudyID)
   -- Get patient details
   local patientDetails = ParseJson(RestApiGet('/patients/' .. patientOrthancID))
 
   -- Loop through the studies of the patient
   for _, studyOrthancID in ipairs(patientDetails['Studies']) do
-    -- Get study details with requestedTags query parameter
-    local requestedTags = 'StudyInstanceUID'
-    local studyDetails = ParseJson(RestApiGet('/studies/' .. studyOrthancID .. '?requestedTags=' .. requestedTags))
+    -- Get study details
+    local studyDetails = ParseJson(RestApiGet('/studies/' .. studyOrthancID))
 
-    -- Check if the current study's StudyInstanceUID matches the targetStudyInstanceUID
-    if studyDetails['MainDicomTags']['StudyInstanceUID'] == targetStudyInstanceUID then
+    -- Check if the current study's StudyID matches the targetStudyID
+    if studyDetails['MainDicomTags']['StudyID'] == targetStudyID then
       -- Send the matching study to peers
       SendToPeers(studyOrthancID)
       break
