@@ -16,13 +16,13 @@ function OnStableStudy(studyOrthancID, tags, metadata)
 
   -- Get study details with requestedTags query parameter
   local requestedTags = 'PatientName,PatientBirthDate,StudyDate,ParentPatient'
-  local studyDetails = ParseJson(RestApiGet('/studies/' .. studyOrthancID.. '?requestedTags=' .. requestedTags))
+  local studyDetails = ParseJson(RestApiGet('/studies/' .. studyOrthancID))
 
   -- Get patient name, birth date, and study date directly from the studyDetails
-  local patientName = studyDetails['MainDicomTags']['PatientName']
-  local patientBirthDate = studyDetails['MainDicomTags']['PatientBirthDate']
+  local patientName = studyDetails['PatientMainDicomTags']['PatientName']
+  local patientBirthDate = studyDetails['PatientMainDicomTags']['PatientBirthDate']
   local studyDate = studyDetails['MainDicomTags']['StudyDate']
-  local patienOrthancID = studyDetails['ParentPatient']
+  local patientOrthancID = studyDetails['ParentPatient']
 
   local matcherResponse = RequestMatcher(matcherIp, matcherPort, patientName, patientBirthDate, studyDate)
 
