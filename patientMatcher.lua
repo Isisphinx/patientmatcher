@@ -8,7 +8,7 @@ function OnStableStudy(studyOrthancID, tags, metadata)
   if (stationName == 'SCANNER' and physicianName ~= 'A') then return end
 
   -- Return early if study is already rectified using the custom DICOM tag
-  if tags['0011,0010'] == 'rectified' then return end
+  if string.find(tags['StudyDescription'], '*fixed*') then return end
 
   -- Get port and ip
   local matcherIp = config.matcherIp
@@ -36,7 +36,7 @@ function OnStableStudy(studyOrthancID, tags, metadata)
   local studyReplace = {}
   studyReplace['StudyID'] = matcherResponse['studyid']
   studyReplace['StudyInstanceUID'] = matcherResponse['studyinstanceuid']
-  studyReplace['0011,0010'] = 'rectified'
+  studyReplace['StudyDescription'] = tags['StudyDescription'] .. ' *fixed*'
   local studyCommand = {}
   studyCommand['Replace'] = studyReplace
   studyCommand['Force'] = true
